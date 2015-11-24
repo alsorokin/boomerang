@@ -11,7 +11,7 @@ public class DesktopLauncher {
         config.height = 800;
         config.width = 480;
         config.title = "Boomerang";
-        config.resizable = false;
+        config.resizable = true;
         new LwjglApplication(new BoomerangGame(), config);
     }
 }

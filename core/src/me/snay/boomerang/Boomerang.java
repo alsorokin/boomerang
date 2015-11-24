@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
 enum BoomerangOrientation {
-    STRAIGHT,
-    GAY
+    BOTTOM,
+    TOP
 }
 
 public class Boomerang {
@@ -21,7 +21,7 @@ public class Boomerang {
     private float rotation;
 
     private static final float BOTTOM_STARTING_POINT_Y = (float)(0 - Math.PI / 2);
-    private static final float TOP_STARTING_POINT_Y = (float)(0 - Math.PI/2);
+    private static final float TOP_STARTING_POINT_Y = (float)(Math.PI/2);
     private static final float BOTTOM_STARTING_POINT_X = 0;
     private static final float TOP_STARTING_POINT_X = (float)Math.PI;
     private static final float PI2 = (float)(Math.PI * 2);
@@ -52,19 +52,20 @@ public class Boomerang {
 
     public Boomerang(Field field, BoomerangOrientation orientation) {
         this.orientation = orientation;
-        texture = new Texture("boomerang.png");
+        this.texture = new Texture("boomerang.png");
         this.size = texture.getWidth() / 2;
         this.field = field;
         this.isTossed = false;
+        this.rotation = 0F;
 
         switch (orientation) {
-            case STRAIGHT:
+            case BOTTOM:
                 this.x = this.size / 2;
                 this.y = this.size / 2;
                 this.timeTravelledX = BOTTOM_STARTING_POINT_X;
                 this.timeTravelledY = BOTTOM_STARTING_POINT_Y;
                 break;
-            case GAY:
+            case TOP:
                 this.x = field.getWidth() - (this.size / 2);
                 this.y = field.getHeight() - (this.size / 2);
                 this.timeTravelledX = TOP_STARTING_POINT_X;
@@ -74,27 +75,29 @@ public class Boomerang {
     }
 
     public void Move() {
-        this.timeTravelledX += Gdx.graphics.getDeltaTime();
-        if (this.timeTravelledX >= PI2) {
-            this.timeTravelledX -= PI2;
+        timeTravelledX += Gdx.graphics.getDeltaTime();
+        if (timeTravelledX >= PI2) {
+            timeTravelledX -= PI2;
         }
-        this.x = (float)Math.cos(timeTravelledX) * 222F + (this.field.getWidth() / 2);
+        x = (float)Math.cos(timeTravelledX) * 222F + field.getHalfWidth();
 
-        if (!this.isTossed) return; // Move by Y axis only if is tossed
+        if (!isTossed) return; // Move by Y axis only if is tossed
 
-        this.timeTravelledY += Gdx.graphics.getDeltaTime();
+        timeTravelledY += Gdx.graphics.getDeltaTime();
 
-        if (this.orientation == BoomerangOrientation.STRAIGHT
-                && this.timeTravelledY >= BOTTOM_STARTING_POINT_Y + PI2) {
-            this.timeTravelledY = BOTTOM_STARTING_POINT_Y;
-            this.isTossed = false;
-        } else if (this.orientation == BoomerangOrientation.GAY
-                && this.timeTravelledY >= TOP_STARTING_POINT_Y + PI2) {
-            this.timeTravelledY = TOP_STARTING_POINT_Y;
-            this.isTossed = false;
+        if (orientation == BoomerangOrientation.BOTTOM
+                && timeTravelledY >= BOTTOM_STARTING_POINT_Y + PI2) {
+            timeTravelledY = BOTTOM_STARTING_POINT_Y;
+            isTossed = false;
+            rotation = 0F;
+        } else if (orientation == BoomerangOrientation.TOP
+                && timeTravelledY >= TOP_STARTING_POINT_Y + PI2) {
+            timeTravelledY = TOP_STARTING_POINT_Y;
+            isTossed = false;
+            rotation = 0F;
         }
-        this.y = (float)Math.sin(timeTravelledY) * 380F + this.field.getHeight() / 2;
+        y = (float)Math.sin(timeTravelledY) * 380F + field.getHalfHeight();
 
-        this.rotation -= 7F;
+        rotation -= 7F;
     }
 }
