@@ -1,5 +1,45 @@
 package me.snay.boomerang;
 
-public class Bonus {
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Circle;
 
+import java.util.Random;
+
+public class Bonus extends GameObject{
+    private Circle hitbox;
+    private Random random = new Random();
+    private Field field;
+
+    public Circle getHitbox() {
+        return hitbox;
+    }
+
+    @Override
+    public void setX(float value) {
+        super.setX(value);
+        this.hitbox.setX(value);
+    }
+
+    @Override
+    public void setY(float value) {
+        super.setY(value);
+        this.hitbox.setY(value);
+    }
+
+    public Bonus(BonusType type, float x, float y, Field field) {
+        switch (type) {
+            case PIGEON:
+                this.texture = new Texture("bonus.png");
+        }
+        this.size = this.texture.getHeight() / 2;
+        this.hitbox = new Circle(x, y, this.size / 2);
+        setX(x);
+        setY(y);
+        this.field = field;
+    }
+
+    public void relocate() {
+        setX(random.nextFloat() * field.getWidth());
+        setY(random.nextFloat() * field.getHeight());
+    }
 }

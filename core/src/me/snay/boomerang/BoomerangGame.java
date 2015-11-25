@@ -14,9 +14,10 @@ public class BoomerangGame extends ApplicationAdapter {
     final float FIELD_HEIGHT = 800;
     final float FIELD_WIDTH = 480;
 
-    SpriteBatch batch;
-    Boomerang player1;
-    Boomerang player2;
+    private SpriteBatch batch;
+    private Boomerang player1;
+    private Boomerang player2;
+    private Bonus[] bonuses = new Bonus[10];
     private Field field;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -33,9 +34,10 @@ public class BoomerangGame extends ApplicationAdapter {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
+        background = new Texture("background.png");
         player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
-        background = new Texture("background.png");
+        bonuses[0] = new Bonus(BonusType.PIGEON, field.getWidth() / 2, field.getHeight() / 2, field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
     }
@@ -45,6 +47,7 @@ public class BoomerangGame extends ApplicationAdapter {
         // Logical stuff
         player1.Move();
         player2.Move();
+        checkCollisions();
 
         // Graphical stuff
         //Gdx.gl.glClearColor(0F, 0F, 0F, 1);
@@ -55,8 +58,8 @@ public class BoomerangGame extends ApplicationAdapter {
         batch.draw(player1.getTexture(),
                 player1.getTextureX(),
                 player1.getTextureY(),
-                0,
-                player1.getSize() / 1.75F,
+                player2.getSize() / 2,
+                player2.getSize() / 2,
                 player1.getSize(),
                 player1.getSize(),
                 1,
@@ -84,9 +87,18 @@ public class BoomerangGame extends ApplicationAdapter {
                 player2.getTexture().getHeight(),
                 false,
                 false);
+        for (Bonus bonus : bonuses) {
+            if (bonus != null) {
+                batch.draw(bonus.getTexture(),
+                        bonus.getTextureX(),
+                        bonus.getTextureY(),
+                        bonus.getSize(),
+                        bonus.getSize());
+            }
+        }
         batch.end();
 
-        // Input
+        // Input stuff
         for (int i = 0; i < 20; i++) {
             if (Gdx.input.isTouched(i)) {
                 float x = Gdx.input.getX(i);
@@ -105,5 +117,16 @@ public class BoomerangGame extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
+    }
+
+    protected void checkCollisions() {
+        for (Bonus bonus : bonuses) {
+            if (bonus == null) continue;
+            if (bonus.getHitbox().overlaps(player1.getHitbox())) {
+                bonus.relocate(); // TODO: Increase player's score
+            } else if (bonus.getHitbox().overlaps(player2.getHitbox())) {
+                bonus.relocate(); // TODO: Increase player's score
+            }
+        }
     }
 }

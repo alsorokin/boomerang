@@ -2,23 +2,21 @@ package me.snay.boomerang;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Circle;
 
 enum BoomerangOrientation {
     BOTTOM,
     TOP
 }
 
-public class Boomerang {
-    private float x;
-    private float y;
+public class Boomerang extends GameObject {
     private float timeTravelledX;
     private float timeTravelledY;
-    private float size;
     private BoomerangOrientation orientation;
-    private Texture texture;
     private Field field;
     private boolean isTossed;
     private float rotation;
+    private Circle hitbox;
 
     private static final float BOTTOM_STARTING_POINT_Y = (float)(0 - Math.PI / 2);
     private static final float TOP_STARTING_POINT_Y = (float)(Math.PI/2);
@@ -26,28 +24,28 @@ public class Boomerang {
     private static final float TOP_STARTING_POINT_X = (float)Math.PI;
     private static final float PI2 = (float)(Math.PI * 2);
 
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public float getTextureX() {
-        return this.x - (this.size / 2);
-    }
-
-    public float getTextureY() {
-        return this.y - (this.size / 2);
-    }
-
-    public float getSize() {
-        return size;
-    }
-
     public float getRotation() {
         return rotation;
     }
 
+    public Circle getHitbox() {
+        return hitbox;
+    }
+
     public void toss() {
         isTossed = true;
+    }
+
+    @Override
+    public void setX(float value) {
+        super.setX(value);
+        hitbox.setX(value);
+    }
+
+    @Override
+    public void setY(float value) {
+        super.setY(value);
+        hitbox.setY(value);
     }
 
     public Boomerang(Field field, BoomerangOrientation orientation) {
@@ -57,17 +55,18 @@ public class Boomerang {
         this.field = field;
         this.isTossed = false;
         this.rotation = 0F;
+        this.hitbox = new Circle(0, 0, this.size / 2); // will be aligned automatically by setX() and setY()
 
         switch (orientation) {
             case BOTTOM:
-                this.x = this.size / 2;
-                this.y = this.size / 2;
+                setX(this.size / 2);
+                setY(this.size / 2);
                 this.timeTravelledX = BOTTOM_STARTING_POINT_X;
                 this.timeTravelledY = BOTTOM_STARTING_POINT_Y;
                 break;
             case TOP:
-                this.x = field.getWidth() - (this.size / 2);
-                this.y = field.getHeight() - (this.size / 2);
+                setX(field.getWidth() - (this.size / 2));
+                setY(field.getHeight() - (this.size / 2));
                 this.timeTravelledX = TOP_STARTING_POINT_X;
                 this.timeTravelledY = TOP_STARTING_POINT_Y;
                 break;
@@ -79,7 +78,7 @@ public class Boomerang {
         if (timeTravelledX >= PI2) {
             timeTravelledX -= PI2;
         }
-        x = (float)Math.cos(timeTravelledX) * 222F + field.getHalfWidth();
+        setX((float) Math.cos(timeTravelledX) * 222F + field.getHalfWidth());
 
         if (!isTossed) return; // Move by Y axis only if is tossed
 
@@ -89,14 +88,12 @@ public class Boomerang {
                 && timeTravelledY >= BOTTOM_STARTING_POINT_Y + PI2) {
             timeTravelledY = BOTTOM_STARTING_POINT_Y;
             isTossed = false;
-            rotation = 0F;
         } else if (orientation == BoomerangOrientation.TOP
                 && timeTravelledY >= TOP_STARTING_POINT_Y + PI2) {
             timeTravelledY = TOP_STARTING_POINT_Y;
             isTossed = false;
-            rotation = 0F;
         }
-        y = (float)Math.sin(timeTravelledY) * 380F + field.getHalfHeight();
+        setY((float) Math.sin(timeTravelledY) * 380F + field.getHalfHeight());
 
         rotation -= 7F;
     }
