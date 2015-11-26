@@ -39,4 +39,8 @@ public class GameObject {
     public void setY(float value) {
         y = value;
     }
+
+    public void dispose() {
+        texture.dispose();
+    }
 }

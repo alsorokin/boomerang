@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -17,11 +18,14 @@ public class BoomerangGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private Boomerang player1;
     private Boomerang player2;
+    private int player1Score;
+    private int player2Score;
     private Bonus[] bonuses = new Bonus[10];
     private Field field;
     private OrthographicCamera camera;
     private Viewport viewport;
     private Texture background;
+    private BitmapFont scoreFont;
 
     @Override
     public void create() {
@@ -37,6 +41,9 @@ public class BoomerangGame extends ApplicationAdapter {
         background = new Texture("background.png");
         player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
+        player1Score = 0;
+        player2Score = 0;
+        scoreFont = new BitmapFont();
         bonuses[0] = new Bonus(BonusType.PIGEON, field.getWidth() / 2, field.getHeight() / 2, field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
@@ -45,8 +52,8 @@ public class BoomerangGame extends ApplicationAdapter {
     @Override
     public void render() {
         // Logical stuff
-        player1.Move();
-        player2.Move();
+        player1.move();
+        player2.move();
         checkCollisions();
 
         // Graphical stuff
@@ -96,6 +103,8 @@ public class BoomerangGame extends ApplicationAdapter {
                         bonus.getSize());
             }
         }
+        scoreFont.draw(batch, String.valueOf(player2Score), 15F, field.getHeight() - 30);
+        scoreFont.draw(batch, String.valueOf(player1Score), field.getWidth() - 30, 45);
         batch.end();
 
         // Input stuff
@@ -123,10 +132,25 @@ public class BoomerangGame extends ApplicationAdapter {
         for (Bonus bonus : bonuses) {
             if (bonus == null) continue;
             if (bonus.getHitbox().overlaps(player1.getHitbox())) {
-                bonus.relocate(); // TODO: Increase player's score
+                bonus.relocate();
+                player1Score++;
             } else if (bonus.getHitbox().overlaps(player2.getHitbox())) {
-                bonus.relocate(); // TODO: Increase player's score
+                bonus.relocate();
+                player2Score++;
             }
+        }
+    }
+
+    @Override
+    public void dispose() {
+        player1.dispose();
+        player2.dispose();
+        batch.dispose();
+        //field.dispose();
+        background.dispose();
+        scoreFont.dispose();
+        for (Bonus bonus : bonuses) {
+            bonus.dispose();
         }
     }
 }

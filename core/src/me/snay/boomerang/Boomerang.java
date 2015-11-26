@@ -73,14 +73,14 @@ public class Boomerang extends GameObject {
         }
     }
 
-    public void Move() {
+    public void move() {
         timeTravelledX += Gdx.graphics.getDeltaTime();
         if (timeTravelledX >= PI2) {
             timeTravelledX -= PI2;
         }
         setX((float) Math.cos(timeTravelledX) * 222F + field.getHalfWidth());
 
-        if (!isTossed) return; // Move by Y axis only if is tossed
+        if (!isTossed) return; // move by Y axis only if is tossed
 
         timeTravelledY += Gdx.graphics.getDeltaTime();
 
