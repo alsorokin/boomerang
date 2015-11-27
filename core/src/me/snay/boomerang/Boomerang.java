@@ -51,22 +51,22 @@ public class Boomerang extends GameObject {
     public Boomerang(Field field, BoomerangOrientation orientation) {
         this.orientation = orientation;
         this.texture = new Texture("boomerang.png");
-        this.size = texture.getWidth() / 2;
+        this.setScale(0.7F);
         this.field = field;
         this.isTossed = false;
         this.rotation = 0F;
-        this.hitbox = new Circle(0, 0, this.size / 2); // will be aligned automatically by setX() and setY()
+        this.hitbox = new Circle(0, 0, this.getSize() / 2); // will be aligned automatically by setX() and setY()
 
         switch (orientation) {
             case BOTTOM:
-                setX(this.size / 2);
-                setY(this.size / 2);
+                setX(this.getWidth() / 2);
+                setY(this.getHeight() / 2);
                 this.timeTravelledX = BOTTOM_STARTING_POINT_X;
                 this.timeTravelledY = BOTTOM_STARTING_POINT_Y;
                 break;
             case TOP:
-                setX(field.getWidth() - (this.size / 2));
-                setY(field.getHeight() - (this.size / 2));
+                setX(field.getWidth() - (this.getWidth() / 2));
+                setY(field.getHeight() - (this.getHeight() / 2));
                 this.timeTravelledX = TOP_STARTING_POINT_X;
                 this.timeTravelledY = TOP_STARTING_POINT_Y;
                 break;

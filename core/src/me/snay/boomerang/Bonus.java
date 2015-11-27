@@ -31,8 +31,8 @@ public class Bonus extends GameObject{
             case PIGEON:
                 this.texture = new Texture("bonus.png");
         }
-        this.size = this.texture.getHeight() / 2;
-        this.hitbox = new Circle(x, y, this.size / 2);
+        this.setScale(0.5F);
+        this.hitbox = new Circle(x, y, this.getSize() / 2);
         setX(x);
         setY(y);
         this.field = field;

@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class GameObject {
     private float x;
     private float y;
-    protected float size;
+    protected float width;
+    protected float height;
     protected Texture texture;
 
     public Texture getTexture() {
@@ -13,15 +14,15 @@ public class GameObject {
     }
 
     public float getTextureX() {
-        return this.x - (this.size / 2);
+        return this.x - (this.getSize() / 2);
     }
 
     public float getTextureY() {
-        return this.y - (this.size / 2);
+        return this.y - (this.getSize() / 2);
     }
 
     public float getSize() {
-        return size;
+        return (width + height) / 2;
     }
 
     public float getX() {
@@ -38,6 +39,24 @@ public class GameObject {
 
     public void setY(float value) {
         y = value;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setScale(float scale) {
+        width = texture.getWidth() * scale;
+        height = texture.getHeight() * scale;
+    }
+
+    public void setSize(float size) {
+        width = size;
+        height = size;
     }
 
     public void dispose() {
