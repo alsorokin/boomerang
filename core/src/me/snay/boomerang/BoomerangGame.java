@@ -39,8 +39,8 @@ public class BoomerangGame extends ApplicationAdapter {
         background = new Texture("background.png");
         player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
-        player1Score = new Score(20, 20, 3);
-        player2Score = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 44, 3);
+        player1Score = new Score(20, 44, 3);
+        player2Score = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
         bonuses[0] = new Bonus(BonusType.PIGEON, field.getWidth() / 2, field.getHeight() / 2, field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
@@ -130,10 +130,10 @@ public class BoomerangGame extends ApplicationAdapter {
             if (bonus == null) continue;
             if (bonus.getHitbox().overlaps(player1.getHitbox())) {
                 bonus.relocate();
-                player1Score.increase();
+                player1Score.increase(player1.getHitScore());
             } else if (bonus.getHitbox().overlaps(player2.getHitbox())) {
                 bonus.relocate();
-                player2Score.increase();
+                player2Score.increase(player2.getHitScore());
             }
         }
     }

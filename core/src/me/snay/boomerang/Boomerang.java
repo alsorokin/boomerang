@@ -18,11 +18,11 @@ public class Boomerang extends GameObject {
     private float rotation;
     private Circle hitbox;
 
-    private static final float BOTTOM_STARTING_POINT_Y = (float)(0 - Math.PI / 2);
-    private static final float TOP_STARTING_POINT_Y = (float)(Math.PI/2);
-    private static final float BOTTOM_STARTING_POINT_X = 0;
-    private static final float TOP_STARTING_POINT_X = (float)Math.PI;
-    private static final float PI2 = (float)(Math.PI * 2);
+    private static final float BOTTOM_STARTING_POINT_Y = (float)(0F - Math.PI / 2D);
+    private static final float TOP_STARTING_POINT_Y = (float)(Math.PI / 2D);
+    private static final float BOTTOM_STARTING_POINT_X = (float)Math.PI;
+    private static final float TOP_STARTING_POINT_X = 0F;
+    private static final float PI2 = (float)(Math.PI * 2D);
 
     public float getRotation() {
         return rotation;
@@ -96,5 +96,16 @@ public class Boomerang extends GameObject {
         setY((float) Math.sin(timeTravelledY) * 380F + field.getHalfHeight());
 
         rotation -= 7F;
+    }
+
+    public int getHitScore() {
+        switch (orientation) {
+            case BOTTOM:
+                return 1 + Math.abs((int)Math.floor(timeTravelledY - BOTTOM_STARTING_POINT_Y));
+            case TOP:
+                return 1 + Math.abs((int)Math.floor(timeTravelledY - TOP_STARTING_POINT_Y));
+            default:
+                return 0;
+        }
     }
 }

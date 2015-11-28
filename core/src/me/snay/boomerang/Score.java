@@ -6,10 +6,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Score {
     private Texture font;
+    private TextureRegion glyphs[];
+    private Texture delimiter;
     private float x;
     private float y;
     private int digits[];
-    private TextureRegion glyphs[];
     private int score;
 
     private static final int GLYPH_WIDTH = 19;
@@ -24,12 +25,13 @@ public class Score {
         for (int i = 0; i < 10; i++) {
             glyphs[i] = new TextureRegion(font, GLYPH_WIDTH * i, 0, GLYPH_WIDTH, GLYPH_HEIGHT);
         }
+        delimiter = new Texture("horizontal-delimiter.png");
     }
 
     public void set(int score) {
         this.score = score;
         for (int i = 0; i < digits.length; i++) {
-            digits[i] = getNthDigit(score, i + 1);
+            digits[i] = getNthDigit(i + 1);
         }
     }
 
@@ -51,11 +53,24 @@ public class Score {
 
     public void draw(SpriteBatch batch) {
         for (int i = 0; i < digits.length; i++) {
-            batch.draw(glyphs[digits[i]], x + ((digits.length - 1 - i) * GLYPH_WIDTH), y);
+            batch.draw(glyphs[digits[i]],
+                    x + (i * GLYPH_WIDTH),
+                    y,
+                    glyphs[digits[i]].getRegionWidth() / 2,
+                    glyphs[digits[i]].getRegionHeight() / 2,
+                    glyphs[digits[i]].getRegionWidth(),
+                    glyphs[digits[i]].getRegionHeight(),
+                    1,
+                    1,
+                    180F);
+            batch.draw(glyphs[digits[i]],
+                    x + ((digits.length - 1 - i) * GLYPH_WIDTH),
+                    y + GLYPH_HEIGHT + delimiter.getHeight() + 4);
+            batch.draw(delimiter, x, y + GLYPH_HEIGHT + 2);
         }
     }
 
-    private int getNthDigit(int number, int n) {
-        return (int) ((number / Math.pow(10, n - 1)) % 10);
+    private int getNthDigit(int n) {
+        return (int)((score / Math.pow(10, n - 1)) % 10);
     }
 }
