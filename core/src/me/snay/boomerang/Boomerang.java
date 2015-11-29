@@ -49,8 +49,12 @@ public class Boomerang extends GameObject {
     }
 
     public Boomerang(Field field, BoomerangOrientation orientation) {
+        super(
+                orientation == BoomerangOrientation.BOTTOM ?
+                new Texture("boomerang-yellow.png") :
+                new Texture("boomerang-red.png")
+        );
         this.orientation = orientation;
-        this.texture = new Texture("boomerang.png");
         this.setScale(0.7F);
         this.field = field;
         this.isTossed = false;

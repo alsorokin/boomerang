@@ -9,8 +9,21 @@ public class GameObject {
     protected float height;
     protected Texture texture;
 
+    public GameObject(Texture texture) {
+        this.texture = texture;
+        this.width = texture.getWidth();
+        this.height = texture.getHeight();
+    }
+
     public Texture getTexture() {
         return texture;
+    }
+
+    public void setTexture(Texture texture) {
+        if (this.texture != null) {
+            this.texture.dispose();
+        }
+        this.texture = texture;
     }
 
     public float getTextureX() {
@@ -39,6 +52,11 @@ public class GameObject {
 
     public void setY(float value) {
         y = value;
+    }
+
+    public void setPosition(float x, float y) {
+        setX(x);
+        setY(y);
     }
 
     public float getWidth() {

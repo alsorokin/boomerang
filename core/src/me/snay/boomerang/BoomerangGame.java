@@ -41,7 +41,7 @@ public class BoomerangGame extends ApplicationAdapter {
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
         player1Score = new Score(20, 44, 3);
         player2Score = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
-        bonuses[0] = new Bonus(BonusType.PIGEON, field.getWidth() / 2, field.getHeight() / 2, field);
+        bonuses[0] = new Bonus(BonusType.PIGEON, field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
     }
@@ -59,7 +59,8 @@ public class BoomerangGame extends ApplicationAdapter {
 
         batch.begin();
         batch.draw(background, 0F, 0F, field.getWidth(), field.getHeight());
-        batch.draw(player1.getTexture(),
+        batch.draw(
+                player1.getTexture(),
                 player1.getTextureX(),
                 player1.getTextureY(),
                 player2.getSize() / 2,
@@ -74,8 +75,10 @@ public class BoomerangGame extends ApplicationAdapter {
                 player1.getTexture().getWidth(),
                 player1.getTexture().getHeight(),
                 false,
-                false);
-        batch.draw(player2.getTexture(),
+                false
+        );
+        batch.draw(
+                player2.getTexture(),
                 player2.getTextureX(),
                 player2.getTextureY(),
                 player2.getSize() / 2,
@@ -90,14 +93,11 @@ public class BoomerangGame extends ApplicationAdapter {
                 player2.getTexture().getWidth(),
                 player2.getTexture().getHeight(),
                 false,
-                false);
+                false
+        );
         for (Bonus bonus : bonuses) {
             if (bonus != null) {
-                batch.draw(bonus.getTexture(),
-                        bonus.getTextureX(),
-                        bonus.getTextureY(),
-                        bonus.getSize(),
-                        bonus.getSize());
+                bonus.draw(batch);
             }
         }
         player1Score.draw(batch);
