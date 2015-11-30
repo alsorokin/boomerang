@@ -2,11 +2,14 @@ package me.snay.boomerang;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -17,6 +20,8 @@ public class BoomerangGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private Boomerang player1;
     private Boomerang player2;
+    private Boomerang player1Tracer;
+    private Boomerang player2Tracer;
     private Score player1Score;
     private Score player2Score;
     private Bonus[] bonuses = new Bonus[10];
@@ -24,6 +29,16 @@ public class BoomerangGame extends ApplicationAdapter {
     private OrthographicCamera camera;
     private Viewport viewport;
     private Texture background;
+    private TouchRegister[] touched = new TouchRegister[20];
+    private ShapeRenderer shapeRenderer;
+    private Boomerang tracer;
+    private Boomerang boomerang;
+
+    private class TouchRegister {
+        public boolean isTouched = false;
+        public boolean isTop = false;
+        public long timestamp;
+    }
 
     @Override
     public void create() {
@@ -32,25 +47,33 @@ public class BoomerangGame extends ApplicationAdapter {
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+        shapeRenderer = new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(camera.combined);
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
         background = new Texture("background.png");
         player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
+        player1Tracer = new Boomerang(field, BoomerangOrientation.BOTTOM);
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
+        player2Tracer = new Boomerang(field, BoomerangOrientation.TOP);
         player1Score = new Score(20, 44, 3);
         player2Score = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
         bonuses[0] = new Bonus(BonusType.PIGEON, field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
+
+        for (int i = 0; i < 20; i++) {
+            touched[i] = new TouchRegister();
+        }
     }
 
     @Override
     public void render() {
         // Logical stuff
-        player1.move();
-        player2.move();
+        player1.move(Gdx.graphics.getDeltaTime());
+        player2.move(Gdx.graphics.getDeltaTime());
         checkCollisions();
 
         // Graphical stuff
@@ -107,11 +130,42 @@ public class BoomerangGame extends ApplicationAdapter {
         // Input stuff
         for (int i = 0; i < 20; i++) {
             if (Gdx.input.isTouched(i)) {
-                float x = Gdx.input.getX(i);
-                float y = Gdx.input.getY(i);
-                Vector2 newPoints = new Vector2(x, y);
-                newPoints = viewport.unproject(newPoints);
-                if (newPoints.y > field.getHalfHeight()) {
+                if (!touched[i].isTouched) {
+                    touched[i].isTouched = true;
+                    touched[i].timestamp = TimeUtils.millis();
+                    Vector2 newPoints = new Vector2(Gdx.input.getX(i), Gdx.input.getY(i));
+                    newPoints = viewport.unproject(newPoints);
+                    if (newPoints.y > field.getHalfHeight()) {
+                        touched[i].isTop = true;
+                    } else {
+                        touched[i].isTop = false;
+                    }
+                }
+                if (TimeUtils.millis() > touched[i].timestamp + 1000) {
+                    if (!touched[i].isTop) {
+                        boomerang = player1;
+                        tracer = player1Tracer;
+                        shapeRenderer.setColor(Color.YELLOW);
+                    } else {
+                        boomerang = player2;
+                        tracer = player2Tracer;
+                        shapeRenderer.setColor(Color.RED);
+                    }
+                    tracer.setPosition(boomerang.getX(), boomerang.getY());
+                    tracer.setTTX(boomerang.getTTX());
+                    tracer.setTTY(boomerang.getTTY());
+
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    for (int j = 0; j < 120; j++) {
+                        tracer.toss();
+                        tracer.move(0.05F);
+                        shapeRenderer.circle(tracer.getTextureX(), tracer.getTextureY(), 3);
+                    }
+                    shapeRenderer.end();
+                }
+            } else if (touched[i].isTouched) {
+                touched[i].isTouched = false;
+                if (touched[i].isTop) {
                     player2.toss();
                 } else {
                     player1.toss();

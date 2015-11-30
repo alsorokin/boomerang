@@ -1,6 +1,5 @@
 package me.snay.boomerang;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 
@@ -48,6 +47,22 @@ public class Boomerang extends GameObject {
         hitbox.setY(value);
     }
 
+    public float getTTX() {
+        return timeTravelledX;
+    }
+
+    public void setTTX(float value) {
+        timeTravelledX = value;
+    }
+
+    public float getTTY() {
+        return timeTravelledY;
+    }
+
+    public void setTTY(float value) {
+        timeTravelledY = value;
+    }
+
     public Boomerang(Field field, BoomerangOrientation orientation) {
         super(
                 orientation == BoomerangOrientation.BOTTOM ?
@@ -77,8 +92,8 @@ public class Boomerang extends GameObject {
         }
     }
 
-    public void move() {
-        timeTravelledX += Gdx.graphics.getDeltaTime();
+    public void move(float delta) {
+        timeTravelledX += delta;
         if (timeTravelledX >= PI2) {
             timeTravelledX -= PI2;
         }
@@ -86,7 +101,7 @@ public class Boomerang extends GameObject {
 
         if (!isTossed) return; // move by Y axis only if is tossed
 
-        timeTravelledY += Gdx.graphics.getDeltaTime();
+        timeTravelledY += delta;
 
         if (orientation == BoomerangOrientation.BOTTOM
                 && timeTravelledY >= BOTTOM_STARTING_POINT_Y + PI2) {
