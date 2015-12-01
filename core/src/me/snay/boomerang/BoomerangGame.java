@@ -33,6 +33,7 @@ public class BoomerangGame extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer;
     private Boomerang tracer;
     private Boomerang boomerang;
+    private float traceRadius;
 
     private class TouchRegister {
         public boolean isTouched = false;
@@ -141,7 +142,7 @@ public class BoomerangGame extends ApplicationAdapter {
                         touched[i].isTop = false;
                     }
                 }
-                if (TimeUtils.millis() > touched[i].timestamp + 1000) {
+                if (TimeUtils.millis() > touched[i].timestamp + 500) {
                     if (!touched[i].isTop) {
                         boomerang = player1;
                         tracer = player1Tracer;
@@ -156,10 +157,14 @@ public class BoomerangGame extends ApplicationAdapter {
                     tracer.setTTY(boomerang.getTTY());
 
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    for (int j = 0; j < 120; j++) {
-                        tracer.toss();
+                    traceRadius = 5F;
+                    tracer.toss();
+                    for (int j = 0; j < 60; j++) {
                         tracer.move(0.05F);
-                        shapeRenderer.circle(tracer.getTextureX(), tracer.getTextureY(), 3);
+                        if (traceRadius > 0 && tracer.isTossed()) {
+                            shapeRenderer.circle(tracer.getX(), tracer.getY(), traceRadius);
+                        }
+                        traceRadius -= 0.1F;
                     }
                     shapeRenderer.end();
                 }
@@ -197,6 +202,7 @@ public class BoomerangGame extends ApplicationAdapter {
         player1.dispose();
         player2.dispose();
         batch.dispose();
+        shapeRenderer.dispose();
         //field.dispose();
         background.dispose();
         for (Bonus bonus : bonuses) {

@@ -35,6 +35,10 @@ public class Boomerang extends GameObject {
         isTossed = true;
     }
 
+    public boolean isTossed() {
+        return isTossed;
+    }
+
     @Override
     public void setX(float value) {
         super.setX(value);
