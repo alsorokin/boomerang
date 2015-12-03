@@ -29,6 +29,10 @@ public class Score {
     }
 
     public void set(int score) {
+        // TODO: Game over!
+        if (score < 0) {
+            score = 0;
+        }
         this.score = score;
         for (int i = 0; i < digits.length; i++) {
             digits[i] = getNthDigit(i + 1);

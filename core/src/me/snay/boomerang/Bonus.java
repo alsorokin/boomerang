@@ -2,37 +2,13 @@ package me.snay.boomerang;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Circle;
 
 import java.util.Random;
 
-public class Bonus extends GameObject {
-    private Circle hitbox;
+public class Bonus extends CircularObject {
     private Random random = new Random();
     private Field field;
     private GameObject preview;
-
-    public Circle getHitbox() {
-        return hitbox;
-    }
-
-    @Override
-    public void setX(float value) {
-        super.setX(value);
-        this.hitbox.setX(value);
-    }
-
-    @Override
-    public void setY(float value) {
-        super.setY(value);
-        this.hitbox.setY(value);
-    }
-
-    @Override
-    public void setPosition(float x, float y) {
-        setX(x);
-        setY(y);
-    }
 
     public Bonus(BonusType type, Field field) {
         super(new Texture("bonus.png"));
@@ -48,7 +24,6 @@ public class Bonus extends GameObject {
         }
 
         this.field = field;
-        this.hitbox = new Circle(0, 0, this.getSize() / 2);
         relocate();
     }
 

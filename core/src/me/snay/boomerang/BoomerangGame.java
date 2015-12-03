@@ -14,17 +14,23 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class BoomerangGame extends ApplicationAdapter {
-    final float FIELD_HEIGHT = 800;
-    final float FIELD_WIDTH = 480;
+    // Constants
+    private static final float FIELD_HEIGHT = 800;
+    private static final float FIELD_WIDTH = 480;
 
+    // Properties
+    private static boolean drawHitboxes = false;
+
+    // Game objects etc.
     private SpriteBatch batch;
     private Boomerang player1;
     private Boomerang player2;
-    private Boomerang player1Tracer;
-    private Boomerang player2Tracer;
-    private Score player1Score;
-    private Score player2Score;
+    private Boomerang tracer1;
+    private Boomerang tracer2;
+    private Score score1;
+    private Score score2;
     private Bonus[] bonuses = new Bonus[10];
+    private Enemy[] enemies = new Enemy[20];
     private Field field;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -56,12 +62,13 @@ public class BoomerangGame extends ApplicationAdapter {
         field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
         background = new Texture("background.png");
         player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
-        player1Tracer = new Boomerang(field, BoomerangOrientation.BOTTOM);
+        tracer1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
         player2 = new Boomerang(field, BoomerangOrientation.TOP);
-        player2Tracer = new Boomerang(field, BoomerangOrientation.TOP);
-        player1Score = new Score(20, 44, 3);
-        player2Score = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
+        tracer2 = new Boomerang(field, BoomerangOrientation.TOP);
+        score1 = new Score(20, 44, 3);
+        score2 = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
         bonuses[0] = new Bonus(BonusType.PIGEON, field);
+        enemies[0] = new Enemy(field);
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
 
@@ -124,9 +131,34 @@ public class BoomerangGame extends ApplicationAdapter {
                 bonus.draw(batch);
             }
         }
-        player1Score.draw(batch);
-        player2Score.draw(batch);
+        for (Enemy enemy : enemies) {
+            if (enemy != null) {
+                enemy.draw(batch);
+            }
+        }
+        score1.draw(batch);
+        score2.draw(batch);
         batch.end();
+
+        if (drawHitboxes) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.GOLD);
+            shapeRenderer.circle(player1.getHitbox().x, player1.getHitbox().y, player1.getHitbox().radius);
+            shapeRenderer.circle(player2.getHitbox().x, player2.getHitbox().y, player1.getHitbox().radius);
+            shapeRenderer.setColor(Color.BLUE);
+            for (Bonus bonus : bonuses) {
+                if (bonus != null) {
+                    shapeRenderer.circle(bonus.hitbox.x, bonus.hitbox.y, bonus.hitbox.radius);
+                }
+            }
+            shapeRenderer.setColor(Color.RED);
+            for (Enemy enemy : enemies) {
+                if (enemy != null) {
+                    shapeRenderer.circle(enemy.hitbox.x, enemy.hitbox.y, enemy.hitbox.radius);
+                }
+            }
+            shapeRenderer.end();
+        }
 
         // Input stuff
         for (int i = 0; i < 20; i++) {
@@ -145,11 +177,11 @@ public class BoomerangGame extends ApplicationAdapter {
                 if (TimeUtils.millis() > touched[i].timestamp + 500) {
                     if (!touched[i].isTop) {
                         boomerang = player1;
-                        tracer = player1Tracer;
+                        tracer = tracer1;
                         shapeRenderer.setColor(Color.YELLOW);
                     } else {
                         boomerang = player2;
-                        tracer = player2Tracer;
+                        tracer = tracer2;
                         shapeRenderer.setColor(Color.RED);
                     }
                     tracer.setPosition(boomerang.getX(), boomerang.getY());
@@ -189,10 +221,22 @@ public class BoomerangGame extends ApplicationAdapter {
             if (bonus == null) continue;
             if (bonus.getHitbox().overlaps(player1.getHitbox())) {
                 bonus.relocate();
-                player1Score.increase(player1.getHitScore());
+                score1.increase(player1.getHitScore());
             } else if (bonus.getHitbox().overlaps(player2.getHitbox())) {
                 bonus.relocate();
-                player2Score.increase(player2.getHitScore());
+                score2.increase(player2.getHitScore());
+            }
+        }
+        for (Enemy enemy : enemies) {
+            if (enemy == null) continue;
+            if (enemy.getHitbox().overlaps(player1.getHitbox())) {
+                enemy.relocate();
+                player1.resetY();
+                score1.decrease(5);
+            } else if (enemy.getHitbox().overlaps(player2.getHitbox())) {
+                enemy.relocate();
+                player2.resetY();
+                score2.decrease(5);
             }
         }
     }
