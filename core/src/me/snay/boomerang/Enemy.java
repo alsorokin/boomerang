@@ -16,7 +16,11 @@ public class Enemy extends CircularObject{
     }
 
     public void relocate() {
-        setPosition(random.nextFloat() * field.getWidth(), random.nextFloat() * field.getHeight());
+        setPosition(
+                random.nextFloat() * field.getWidth(),
+                // Leave the top and bottom 10% of the game field enemy-free
+                (random.nextFloat() * (field.getHeight() * 0.8F)) + field.getHeight() * 0.1F
+        );
     }
 
     public void draw(SpriteBatch batch) {
