@@ -67,8 +67,12 @@ public class BoomerangGame extends ApplicationAdapter {
         tracer2 = new Boomerang(field, BoomerangOrientation.TOP);
         score1 = new Score(20, 44, 3);
         score2 = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
-        bonuses[0] = new Bonus(BonusType.PIGEON, field);
-        enemies[0] = new Enemy(field);
+        for (int i = 0; i < 1; i++) {
+            bonuses[i] = new Bonus(BonusType.PIGEON, field);
+        }
+        for (int i = 0; i < 1; i++) {
+            enemies[i] = new Enemy(field);
+        }
 
         viewport = new FitViewport(FIELD_WIDTH, FIELD_HEIGHT, camera);
 
@@ -160,7 +164,7 @@ public class BoomerangGame extends ApplicationAdapter {
             shapeRenderer.end();
         }
 
-        // Input stuff
+        // Input and trajectory predictions
         for (int i = 0; i < 20; i++) {
             if (Gdx.input.isTouched(i)) {
                 if (!touched[i].isTouched) {
@@ -191,8 +195,14 @@ public class BoomerangGame extends ApplicationAdapter {
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     traceRadius = 5F;
                     tracer.toss();
+                    tracerLoop:
                     for (int j = 0; j < 60; j++) {
                         tracer.move(0.05F);
+                        for (Enemy enemy : enemies) {
+                            if (enemy != null && enemy.getHitbox().overlaps(tracer.hitbox)) {
+                                break tracerLoop;
+                            }
+                        }
                         if (traceRadius > 0 && tracer.isTossed()) {
                             shapeRenderer.circle(tracer.getX(), tracer.getY(), traceRadius);
                         }
