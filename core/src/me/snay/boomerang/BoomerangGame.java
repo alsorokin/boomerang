@@ -23,10 +23,10 @@ public class BoomerangGame extends ApplicationAdapter {
 
     // Game objects etc.
     private SpriteBatch batch;
-    private Boomerang player1;
-    private Boomerang player2;
-    private Boomerang tracer1;
-    private Boomerang tracer2;
+    private BottomBoomerang player1;
+    private TopBoomerang player2;
+    private BottomBoomerang tracer1;
+    private TopBoomerang tracer2;
     private Score score1;
     private Score score2;
     private Bonus[] bonuses = new Bonus[10];
@@ -61,10 +61,10 @@ public class BoomerangGame extends ApplicationAdapter {
 
         field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
         background = new Texture("background.png");
-        player1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
-        tracer1 = new Boomerang(field, BoomerangOrientation.BOTTOM);
-        player2 = new Boomerang(field, BoomerangOrientation.TOP);
-        tracer2 = new Boomerang(field, BoomerangOrientation.TOP);
+        player1 = new BottomBoomerang(field);
+        tracer1 = new BottomBoomerang(field);
+        player2 = new TopBoomerang(field);
+        tracer2 = new TopBoomerang(field);
         score1 = new Score(20, 44, 3);
         score2 = new Score(FIELD_WIDTH - 77, FIELD_HEIGHT - 68, 3);
         for (int i = 0; i < 1; i++) {
