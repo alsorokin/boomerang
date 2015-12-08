@@ -86,6 +86,11 @@ public class BoomerangGame extends ApplicationAdapter {
         // Logical stuff
         player1.move(Gdx.graphics.getDeltaTime());
         player2.move(Gdx.graphics.getDeltaTime());
+        for (Enemy enemy : enemies) {
+            if (enemy != null) {
+                enemy.move(Gdx.graphics.getDeltaTime());
+            }
+        }
         checkCollisions();
 
         // Graphical stuff
@@ -240,11 +245,11 @@ public class BoomerangGame extends ApplicationAdapter {
         for (Enemy enemy : enemies) {
             if (enemy == null) continue;
             if (enemy.getHitbox().overlaps(player1.getHitbox())) {
-                enemy.relocate();
+                enemy.randomizeImpulse();
                 player1.resetY();
                 score1.decrease(5);
             } else if (enemy.getHitbox().overlaps(player2.getHitbox())) {
-                enemy.relocate();
+                enemy.randomizeImpulse();
                 player2.resetY();
                 score2.decrease(5);
             }
