@@ -29,17 +29,16 @@ public class BoomerangGame extends ApplicationAdapter {
     private TopBoomerang tracer2;
     private Score score1;
     private Score score2;
-    private Bonus[] bonuses = new Bonus[10];
-    private Enemy[] enemies = new Enemy[20];
+    private final Bonus[] bonuses = new Bonus[10];
+    private final Enemy[] enemies = new Enemy[20];
     private Field field;
-    private OrthographicCamera camera;
     private Viewport viewport;
     private Texture background;
-    private TouchRegister[] touched = new TouchRegister[20];
+    private final TouchRegister[] touched = new TouchRegister[20];
     private ShapeRenderer shapeRenderer;
-    private Boomerang tracer;
-    private Boomerang boomerang;
-    private float traceRadius;
+
+    // AI
+    private Brain antiBrain;
 
     private class TouchRegister {
         public boolean isTouched = false;
@@ -49,7 +48,7 @@ public class BoomerangGame extends ApplicationAdapter {
 
     @Override
     public void create() {
-        camera = new OrthographicCamera();
+        OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, FIELD_WIDTH, FIELD_HEIGHT);
 
         batch = new SpriteBatch();
@@ -79,19 +78,28 @@ public class BoomerangGame extends ApplicationAdapter {
         for (int i = 0; i < 20; i++) {
             touched[i] = new TouchRegister();
         }
+
+        antiBrain = new Brain(player2, field, bonuses, enemies);
     }
 
     @Override
     public void render() {
+        float delta = Gdx.graphics.getDeltaTime();
         // Logical stuff
-        player1.move(Gdx.graphics.getDeltaTime());
-        player2.move(Gdx.graphics.getDeltaTime());
+        player1.move(delta);
+        player2.move(delta);
         for (Enemy enemy : enemies) {
             if (enemy != null) {
-                enemy.move(Gdx.graphics.getDeltaTime());
+                enemy.move(delta);
             }
         }
         checkCollisions();
+
+        // AI stuff
+        if (antiBrain != null)
+        {
+            antiBrain.think(delta);
+        }
 
         // Graphical stuff
         //Gdx.gl.glClearColor(0F, 0F, 0F, 1);
@@ -170,20 +178,18 @@ public class BoomerangGame extends ApplicationAdapter {
         }
 
         // Input and trajectory predictions
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 6; i++) {
             if (Gdx.input.isTouched(i)) {
                 if (!touched[i].isTouched) {
                     touched[i].isTouched = true;
                     touched[i].timestamp = TimeUtils.millis();
                     Vector2 newPoints = new Vector2(Gdx.input.getX(i), Gdx.input.getY(i));
                     newPoints = viewport.unproject(newPoints);
-                    if (newPoints.y > field.getHalfHeight()) {
-                        touched[i].isTop = true;
-                    } else {
-                        touched[i].isTop = false;
-                    }
+                    touched[i].isTop = newPoints.y > field.getHalfHeight();
                 }
                 if (TimeUtils.millis() > touched[i].timestamp + 500) {
+                    Boomerang tracer;
+                    Boomerang boomerang;
                     if (!touched[i].isTop) {
                         boomerang = player1;
                         tracer = tracer1;
@@ -194,24 +200,43 @@ public class BoomerangGame extends ApplicationAdapter {
                         shapeRenderer.setColor(Color.RED);
                     }
                     tracer.setPosition(boomerang.getX(), boomerang.getY());
-                    tracer.setTTX(boomerang.getTTX());
-                    tracer.setTTY(boomerang.getTTY());
+                    tracer.setTimeTravelledX(boomerang.getTimeTravelledX());
+                    tracer.setTimeTravelledY(boomerang.getTimeTravelledY());
 
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    traceRadius = 5F;
+                    float traceRadius = 5F;
                     tracer.toss();
                     tracerLoop:
-                    for (int j = 0; j < 60; j++) {
-                        tracer.move(0.05F);
+                    for (int j = 0; j < 75; j++) {
+                        tracer.move(0.04F);
                         for (Enemy enemy : enemies) {
                             if (enemy != null && enemy.getHitbox().overlaps(tracer.hitbox)) {
+                                Vector2 bottomLeft = new Vector2(
+                                        tracer.getX() - 15,
+                                        tracer.getY() - 15
+                                );
+                                Vector2 topLeft = new Vector2(
+                                        tracer.getX() - 15,
+                                        tracer.getY() + 15
+                                );
+                                Vector2 topRight = new Vector2(
+                                        tracer.getX() + 15,
+                                        tracer.getY() + 15
+                                );
+                                Vector2 bottomRight = new Vector2(
+                                        tracer.getX() + 15,
+                                        tracer.getY() - 15
+                                );
+                                shapeRenderer.setColor(Color.BLACK);
+                                shapeRenderer.rectLine(bottomLeft, topRight, 3);
+                                shapeRenderer.rectLine(topLeft, bottomRight, 3);
                                 break tracerLoop;
                             }
                         }
                         if (traceRadius > 0 && tracer.isTossed()) {
                             shapeRenderer.circle(tracer.getX(), tracer.getY(), traceRadius);
                         }
-                        traceRadius -= 0.1F;
+                        traceRadius -= 0.07F;
                     }
                     shapeRenderer.end();
                 }

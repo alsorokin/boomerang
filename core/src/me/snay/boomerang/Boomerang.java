@@ -23,19 +23,19 @@ public abstract class Boomerang extends CircularObject {
         return isTossed;
     }
 
-    public float getTTX() {
+    public float getTimeTravelledX() {
         return timeTravelledX;
     }
 
-    public void setTTX(float value) {
+    public void setTimeTravelledX(float value) {
         timeTravelledX = value;
     }
 
-    public float getTTY() {
+    public float getTimeTravelledY() {
         return timeTravelledY;
     }
 
-    public void setTTY(float value) {
+    public void setTimeTravelledY(float value) {
         timeTravelledY = value;
     }
 
