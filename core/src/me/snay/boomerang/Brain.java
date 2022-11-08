@@ -1,12 +1,24 @@
 package me.snay.boomerang;
 
+import com.badlogic.gdx.math.Circle;
+
 import java.lang.reflect.*;
 
 public class Brain {
+    /**
+     * How much time (in seconds) should pass between consecutive brain activations.
+     */
+    public float activationThreshold = 1F;
+
+    /**
+     * Inflate boomerang hitbox by this factor to intentionally make AI less accurate.
+     * Also has a side effect of AI being more afraid of enemies.
+     */
+    public float hitboxInflationFactor = 1.5F;
+
     private final Boomerang boomerang;
     private Boomerang tracer;
-    public float activationThreshold = 1;
-    private float timeUntilActivation = 1;
+    private float timeUntilActivation = 1F;
     private final Bonus[] bonuses;
     private final Enemy[] enemies;
 
@@ -52,16 +64,21 @@ public class Brain {
         boolean bonusHit = false;
         while (tracer.isTossed)
         {
+            Circle inflatedHitbox = new Circle();
+            inflatedHitbox.x = tracer.hitbox.x;
+            inflatedHitbox.y = tracer.hitbox.y;
+            inflatedHitbox.radius = tracer.hitbox.radius * hitboxInflationFactor;
+
             tracer.move(0.04F);
             for (Bonus bonus : this.bonuses) {
                 for (Enemy enemy : this.enemies)
                 {
-                    if (enemy != null && enemy.getHitbox().overlaps(tracer.hitbox))
+                    if (enemy != null && enemy.getHitbox().overlaps(inflatedHitbox))
                     {
                         return false;
                     }
                 }
-                if (bonus != null && bonus.getHitbox().overlaps(tracer.hitbox)) {
+                if (bonus != null && bonus.getHitbox().overlaps(inflatedHitbox)) {
                     bonusHit = true;
                 }
             }
