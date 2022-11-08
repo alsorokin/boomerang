@@ -207,7 +207,7 @@ public class BoomerangGame extends ApplicationAdapter {
                     float traceRadius = 5F;
                     tracer.toss();
                     tracerLoop:
-                    for (int j = 0; j < 75; j++) {
+                    for (int j = 0; j < (75 / boomerang.getVelocity()); j++) {
                         tracer.move(0.04F);
                         for (Enemy enemy : enemies) {
                             if (enemy != null && enemy.getHitbox().overlaps(tracer.hitbox)) {
@@ -236,7 +236,7 @@ public class BoomerangGame extends ApplicationAdapter {
                         if (traceRadius > 0 && tracer.isTossed()) {
                             shapeRenderer.circle(tracer.getX(), tracer.getY(), traceRadius);
                         }
-                        traceRadius -= 0.07F;
+                        traceRadius -= 0.07F * boomerang.getVelocity();
                     }
                     shapeRenderer.end();
                 }

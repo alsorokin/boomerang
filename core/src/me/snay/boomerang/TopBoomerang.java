@@ -24,7 +24,7 @@ public class TopBoomerang extends Boomerang{
             setTimeTravelledY(STARTING_POINT_Y);
             isTossed = false;
         }
-        setTimeTravelledY(getTimeTravelledY() + delta);
+        setTimeTravelledY(getTimeTravelledY() + (delta * velocity));
         rotation -= 7F;
 
         setY(calculateY());

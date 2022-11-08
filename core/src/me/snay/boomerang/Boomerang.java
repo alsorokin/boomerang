@@ -8,6 +8,7 @@ public abstract class Boomerang extends CircularObject {
     protected Field field;
     protected boolean isTossed;
     protected float rotation;
+    protected float velocity = 1.333F;
 
     protected static final float PI2 = (float) (Math.PI * 2D);
 
@@ -39,6 +40,8 @@ public abstract class Boomerang extends CircularObject {
         timeTravelledY = value;
     }
 
+    public float getVelocity() { return velocity; }
+
     public Boomerang(Field field, Texture texture) {
         super(texture, 0.7F);
         this.field = field;
@@ -47,7 +50,7 @@ public abstract class Boomerang extends CircularObject {
     }
 
     public void move(float delta) {
-        timeTravelledX += delta;
+        timeTravelledX += delta * velocity;
         if (timeTravelledX >= PI2) {
             timeTravelledX -= PI2;
         }
